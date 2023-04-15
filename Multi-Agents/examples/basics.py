@@ -1,4 +1,5 @@
 from spade import agent, quit_spade
+import time
 
 
 class DummyAgent(agent.Agent):
@@ -8,7 +9,14 @@ class DummyAgent(agent.Agent):
 
 dummy = DummyAgent("longovinicius@jix.im", "Jixpassword.")
 future = dummy.start()
-future.result()
 
+future.result()
+# while future.is_alive():
+#     try:
+#         time.sleep(1)
+#     except KeyboardInterrupt:
+#         future.stop()
+#         break
+# print("Agente encerrou!")
 dummy.stop()
 quit_spade()
