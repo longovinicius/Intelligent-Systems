@@ -44,7 +44,7 @@ class Gerador(Agent):
 
     class funcao_1grau(CyclicBehaviour):
         async def run(self):
-            print(f"Rodando funcao {Gerador.funcao_grau} grau")
+            #print(f"Rodando funcao {Gerador.funcao_grau} grau")
             res = await self.receive(timeout=5)
             if res:
                 x = float(res.body)
@@ -58,7 +58,7 @@ class Gerador(Agent):
 
     class funcao_2grau(CyclicBehaviour):
         async def run(self):
-            print(f"Rodando funcao {Gerador.funcao_grau}grau")
+            #print(f"Rodando funcao {Gerador.funcao_grau}grau")
             res = await self.receive(timeout=5)
             if res:
                 x = float(res.body)
@@ -72,7 +72,7 @@ class Gerador(Agent):
 
     class funcao_3grau(CyclicBehaviour):
         async def run(self):
-            print(f"Rodando funcao {Gerador.funcao_grau}grau")
+            #print(f"Rodando funcao {Gerador.funcao_grau}grau")
             res = await self.receive(timeout=5)
             if res:
                 x = float(res.body)
@@ -87,7 +87,7 @@ class Gerador(Agent):
 
     class tipo_funcao(CyclicBehaviour):
         async def run(self):
-            print("Rodando Tipo Funcao")
+            #print("Rodando Tipo Funcao")
             msg = await self.receive(timeout=5)
             if msg:
                 msg = Message(to=str(msg.sender))
