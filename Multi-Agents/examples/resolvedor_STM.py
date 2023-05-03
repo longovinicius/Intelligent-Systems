@@ -1,6 +1,6 @@
 import time
 import random
-
+import numpy as np
 from spade.agent import Agent
 from spade.behaviour import FSMBehaviour, State
 from spade.message import Message
@@ -12,6 +12,7 @@ XMPP_RECEIVER = "longovinicius@yax.im"
 XMPP_SENDER = "lucastt@yax.im"
 XMPP_PASSWORD = "XMPPpassword."
 
+tipo_fc = 0
 
 class ExampleFSMBehaviour(FSMBehaviour):
     async def on_start(self):
@@ -23,7 +24,10 @@ class ExampleFSMBehaviour(FSMBehaviour):
 
 
 class Get_type(State):
+
+    
     async def run(self):
+        global tipo_fc
         print("InformBehav running")
         # Instantiate the message to Gerador
         msg = Message(to=XMPP_RECEIVER)
@@ -41,6 +45,7 @@ class Get_type(State):
             # msg.body = f"{self.tipo_funcao}grau"
             # Resolvedor.function_grau = res[-1]
             print(f"res.body: {res.body}")
+            tipo_fc = int(res.body)
             self.set_next_state(STATE_TWO)
 
 # y = 5X + 1, X1 = 0, y = 1, X2 = 1, y = 6...
@@ -49,23 +54,62 @@ class Get_type(State):
 class Resolver(State):
     async def run(self):
         resolvido = False
-        while (not resolvido):
-            print("Encontrou Tipo de Funcao")
-            x = random.randint(-100, 100)
-            # Instantiate the message to Gerador
-            msg = Message(to=XMPP_RECEIVER)
-            msg.set_metadata("performative", "subscribe")
-            msg.body = str(int(x))
-            await self.send(msg)
+        a, b, c, d = 0
+        R0, R1, R2, R3 = 0
 
-            res = await self.receive(timeout=5)
-            if res:
-                print(f"Valor de y recebido = {int(res.body)}")
-                if int(res.body) == 0:
-                    print(f"Resolvido com x = {x}!!!!")
-                    resolvido = True
-                else:
-                    print(f"Errado em x = {x} Keep trying...")
+        print("Encontrou Tipo de Funcao")
+        x = 0
+        # Instantiate the message to Gerador
+        msg = Message(to=XMPP_RECEIVER)
+        msg.set_metadata("performative", "subscribe")
+        msg.body = str(int(x))
+        await self.send(msg)
+
+        res = await self.receive(timeout=5)
+        if res:
+            print(f"Valor de y recebido = {int(res.body)}")
+            if int(res.body) == 0:
+                print(f"Resolvido com x = {x}!!!!")
+                resolvido = True
+            else:
+                print(f"Errado em x = {x} Keep trying...")
+                R0 = int(res.body)
+
+        x = 1
+        # Instantiate the message to Gerador
+        msg = Message(to=XMPP_RECEIVER)
+        msg.set_metadata("performative", "subscribe")
+        msg.body = str(int(x))
+        await self.send(msg)
+
+        res = await self.receive(timeout=5)
+        if res:
+            print(f"Valor de y recebido = {int(res.body)}")
+            if int(res.body) == 0:
+                print(f"Resolvido com x = {x}!!!!")
+                resolvido = True
+            else:
+                print(f"Errado em x = {x} Keep trying...")
+                R1 = int(res.body)
+        if tipo_fc == 1:
+            b = R0
+            a = R1 - R0
+            x = np.roots([a, b])[0]
+
+        # Instantiate the message to Gerador
+        msg = Message(to=XMPP_RECEIVER)
+        msg.set_metadata("performative", "subscribe")
+        msg.body = str(float(x))
+        await self.send(msg)
+
+        res = await self.receive(timeout=5)
+        if res:
+            print(f"Valor de y recebido = {int(res.body)}")
+            if int(res.body) == 0:
+                print(f"Resolvido com x = {x}!!!!")
+                resolvido = True
+            else:
+                print(f"Errado em x = {x} Keep trying...")
 
 
 class FSMAgent(Agent):
