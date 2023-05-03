@@ -62,15 +62,17 @@ class Resolver(State):
             msg.set_metadata("performative", "subscribe")
             msg.body = str(int(i))
             await self.send(msg)
-
-            res = await self.receive(timeout=5) #!  COMO VER SE TIMEOUT ACONTECEU?????
+        
+            res = await self.receive(timeout=10) #!  COMO VER SE TIMEOUT ACONTECEU?????
             if res:
                 print(f"Valor de y recebido = {int(res.body)} x = {i}")
                 if int(res.body) == 0:
-                    print(f"Resolvido com x = {i}!!!!")
+                    print(f"Resolvido com x = {i}!!!!") #!TERMINAR O AGENTE
+                    return
                 else:
                     print(f"Errado em x = {i} Keep trying...")
                     R = float(res.body)  # ! MUDEI PARA FLOAT
+        
 
             num_elements = []
             for y in range(tipo_fc + 1):
@@ -86,7 +88,7 @@ class Resolver(State):
         msg.body = str(float(soluction))
         await self.send(msg)
 
-        res = await self.receive(timeout=5)
+        res = await self.receive(timeout=10)
         if res:
             print(f"Valor de y recebido = {int(res.body)}")
             if int(res.body) == 0:
