@@ -1,3 +1,4 @@
+import math
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
 from spade.template import Template
@@ -10,19 +11,64 @@ XMPP_LOGIN = "longovinicius@yax.im"
 XMPP_PASSWORD = "XMPPpassword."
 
 
-def gen_coefs(scale, degree):
-    # coeficientes que garantem raiz na funcao
+def generate_linear(scale):
+    # Garante que raizes sejam sempre inteiras
     a = random.randint(-scale, scale)
+    while a == 0:
+        a = random.randint(-scale, scale)
     b = random.randint(-scale, scale)
-    c = random.randint(-scale, scale)
-    d = random.randint(-scale, scale)
+    if isinstance((b / a), int):
+        return a, b
+    else:
+        return generate_linear(scale)
 
+
+def generate_quadratic(scale):
+    # Garante que raizes sejam sempre inteiras
+    c = random.randint(-scale, scale)
+    b_or_a_is_even = False
+    while not b_or_a_is_even:
+        a = random.randint(-scale, scale)
+        b = random.randint(-scale, scale)
+        if a % 2 == 0 or b % 2 == 0:
+            b_or_a_is_even = True
+    discriminant = b**2 - 4*a*c
+    if discriminant >= 0 and math.sqrt(discriminant).is_integer():
+        return a, b, c
+    else:
+        return generate_quadratic(scale)
+
+
+def generate_cubic(scale):
+    # Garante que raizes sejam sempre inteiras
+    d = random.randint(-scale, scale)
+    b_or_c_is_even = False
+    while not b_or_c_is_even:
+        b = random.randint(-scale, scale)
+        c = random.randint(-scale, scale)
+        if b % 2 == 0 or c % 2 == 0:
+            b_or_c_is_even = True
+    a = random.randint(-scale, scale)
+    while (a + b + c) % 3 != 0:
+        a = random.randint(-scale, scale)
+    discriminant = b**2 - 3*a*c
+    discriminant_squared = discriminant**2
+    if discriminant_squared - 4*(a**3)*d >= 0 and math.sqrt(discriminant_squared - 4*(a**3)*d).is_integer():
+        return a, b, c, d
+    else:
+        return generate_cubic(scale)
+
+
+def gen_coefs(scale, degree):
+    # Garantem que existam raizes para a funcao
     if degree == 1:  # a != 0
+        a, b = generate_linear(scale)
         while a == 0:
             a = random.randint(-scale, scale)
         return a, b, None, None
 
     if degree == 2:  # delta >= 0
+        a, b, c = generate_quadratic(scale)
         delta = b**2 - 4*a*c
         while delta < 0 or a == 0:
             a = random.randint(-scale, scale)
@@ -30,6 +76,7 @@ def gen_coefs(scale, degree):
         return a, b, c, None
 
     if degree == 3:  # delta >= 0
+        a, b, c, d = generate_cubic(scale)
         while True:
             a = random.randint(-scale, scale)
             delta = 18*a*b*c*d - 4*b**3*d + b**2*c**2 - 4*a*c**3 - 27*a**2*d**2
@@ -44,7 +91,7 @@ class Gerador(Agent):
 
     class funcao_1grau(CyclicBehaviour):
         async def run(self):
-            #print(f"Rodando funcao {Gerador.funcao_grau} grau")
+            # print(f"Rodando funcao {Gerador.funcao_grau} grau")
             res = await self.receive(timeout=5)
             if res:
                 x = float(res.body)
@@ -58,7 +105,7 @@ class Gerador(Agent):
 
     class funcao_2grau(CyclicBehaviour):
         async def run(self):
-            #print(f"Rodando funcao {Gerador.funcao_grau}grau")
+            # print(f"Rodando funcao {Gerador.funcao_grau}grau")
             res = await self.receive(timeout=5)
             if res:
                 x = float(res.body)
@@ -72,7 +119,7 @@ class Gerador(Agent):
 
     class funcao_3grau(CyclicBehaviour):
         async def run(self):
-            #print(f"Rodando funcao {Gerador.funcao_grau}grau")
+            # print(f"Rodando funcao {Gerador.funcao_grau}grau")
             res = await self.receive(timeout=5)
             if res:
                 x = float(res.body)
@@ -87,7 +134,7 @@ class Gerador(Agent):
 
     class tipo_funcao(CyclicBehaviour):
         async def run(self):
-            #print("Rodando Tipo Funcao")
+            # print("Rodando Tipo Funcao")
             msg = await self.receive(timeout=5)
             if msg:
                 msg = Message(to=str(msg.sender))
